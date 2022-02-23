@@ -1,8 +1,8 @@
 ---------------------------------------------------------------------------------------------------
 -- 
--- top_labo_3.vhd
+-- top_labo_4.vhd
 --
--- v. 1.0 Pierre Langlois 2022-01-09 problème du cadenas
+-- v. 1.0 Pierre Langlois 2022-02-22
 --
 -- Digilent Basys 3 Artix-7 FPGA Trainer Board 
 --
