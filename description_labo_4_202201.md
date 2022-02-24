@@ -4,173 +4,175 @@
 <td><img src="figures\Polytechnique_signature-RGB-gauche_FR.png" alt="Logo de Polytechnique Montréal"></td>
 <td><h2>INF3500 - Conception et réalisation de systèmes numériques
 <br><br>Hiver 2022
-<br><br>Laboratoire #3
-<br><br>Circuits séquentiels et chemins des données
+<br><br>Laboratoire #4 : Conception de chemins des données
 </h2></td>
 </tr>
 </table>
 
 ----------------------------------------------------------------------------------------------
 
-# Le cadenas à boutons
+# Le calcul de la racine carrée par la méthode de Newton
 
 ----------------------------------------------------------------------------------------------
 
-
 À la fin de ce laboratoire, vous devrez être capable de :
 
-- Concevoir un circuit séquentiel à partir d’une spécification. Donner un diagramme d’état, le code VHDL, le schéma du circuit et son implémentation résultante sur un FPGA. (B5)
-    - Utiliser une horloge et un signal de réinitialisation.
-    - Utiliser des registres et des compteurs.
-    - Utiliser une machine à états.
-- Composer un banc d’essai pour stimuler un modèle VHDL d’un circuit séquentiel. Donner le chronogramme résultant de l’exécution d’un banc d’essai. (B4,B5)
-    - Générer un signal d'horloge et un signal de réinitialisation.
-    - Générer des stimuli pour un circuit séquentiel.
-    - Calculer les sorties correspondantes aux stimuli.
-    - Réconcilier les problèmes de synchronisation.
-    - Utiliser des énoncés `assert` ou des conditions pour vérifier le module.
-- Implémenter un circuit séquentiel sur un FPGA et en vérifier le fonctionnement correct
-    - Utiliser des interfaces comme des boutons et des affichages à LED.
-    - Constater et corriger les phénomènes de rebond des boutons et commutateurs.
+- Concevoir et modéliser en VHDL un chemin des données qui réalise des fonctions arithmétiques et logiques complexes au niveau du transfert entre registres (_Register Transfer Level_ – RTL). (B5)
+    - Instancier des registres, dont des compteurs
+    - Implémenter les fonctions arithmétiques et logiques pour les valeurs des registres, correspondant à une spécification par micro-opérations ou par pseudocode
+- Composer un banc d’essai pour stimuler un modèle VHDL d’un chemin des données. (B5)
+    - Générer un signal d'horloge et un signal de réinitialisation
+    - Générer et appliquer des stimuli à un circuit séquentiel
+    - Comparer les sorties du circuit à des réponses attendues pré-calculées
+    - Utiliser des énoncés `assert` ou des conditions pour vérifier le module
+    - Générer un chronogramme résultant de l’exécution du banc d’essai, et l'utiliser pour déboguer le circuit, entre autres pour résoudre les problèmes de synchronisation
+- Implémenter un chemin des données sur un FPGA
+    - Effectuer la synthèse et l'implémentation du circuit
+    - Extraire, analyser et interpréter des métriques de coût d'implémentation
+    - Programmer le FPGA et vérifier le fonctionnement correct du circuit avec les interfaces de la planchette
+    - Communiquer avec le circuit via l'interface série d'un ordinateur
 
-Ce laboratoire s'appuie sur le matériel suivant :
-1. Les concepts couverts dans les laboratoires #1 et #2.
-2. La matière des cours des semaines 4 (Modélisation et vérification de circuits combinatoires) et 5 (Conception de chemins des données - surtout les diapositives 0502).
-
-## Partie 0 : une machine à états de base
+Ce laboratoire s'appuie principalement sur le matériel suivant :
+1. Les procédures utilisées et les habiletés développées dans les laboratoires #1, #2 et #3.
+2. La matière des cours des semaines 4 (Modélisation et vérification de circuits séquentiels), 5 (Conception de chemins des données) et 6 (Conception et implémentation de fonctions arithmétiques sur FPGA).
 
 ### Préparatifs
 
-- Créez un répertoire `inf3500\labo-3`.
-- Importez-y tous les fichiers du laboratoire à partir de l'entrepôt Git.
-- Si vous utilisez Active-HDL :
-    - Créez un espace de travail (workspace) et créez un projet (design).
-    - Ajoutez les fichiers dans votre projet.
-    - Compilez tous les fichiers.
-    
+- Créez un répertoire "inf3500\labo4\" dans lequel vous mettrez tous les fichiers de ce laboratoire.
+- Importez tous les fichiers du laboratoire à partir de l'entrepôt Git et placez-les dans votre répertoire \labo4\
+
+## Partie 0 : Introduction
+
+### Vue d'ensemble
+
+Dans cet exercice de laboratoire, on considère le problème de la conception d'un module qui calcule la racine carrée X d'un nombre A, (A = X &times; X). Ce module pourrait être ajouté à un microprocesseur pour en augmenter le jeu d'instructions.
+
+La figure suivante illustre l'interface du module avec le monde extérieur. Les différents ports du module sont comme suit :
+- Le nombre A est exprimé avec N bits.
+- La racine carrée X est exprimée avec M bits.
+- Les calculs sont lancés quand le signal go a la valeur '1' lors d'une transition positive du signal d'horloge clk. Le signal fini prend alors la valeur '0'.
+- Le signal fini prend la valeur '1' quand les calculs sont terminés, indiquant que le port X représente alors la racine carrée de A.
+- Le module est réinitialisé quand on place un '1' sur le port reset.
+
+<img src="figures/racine-carree-module.svg" alt="module pour calculer la racine carrée" width="600">
+
+### Calcul de la racine carrée par la méthode itérative de Newton
+
+On peut calculer la racine carrée X = sqrt(A) d'un nombre A par [la méthode itérative de Newton](https://fr.wikipedia.org/wiki/M%C3%A9thode_de_Newton#Racine_carr%C3%A9e).
+
+À chaque itération k, on calcule : X<sub>k+1</sub> = (X<sub>k</sub> + A / X<sub>k</sub>) / 2, et la valeur de Xk converge vers X = sqrt(A) après quelques itérations.
+
+Par exemple, pour A = 42871 et X<sub>0</sub> = 256, on obtiendrait la séquence montrée au tableau suivant en effectuant la division à l'aide d'une calculatrice et en arrondissant les Xk à l'entier le plus proche à chaque étape. La valeur finale après quatre itérations, 207, est très proche de la racine carrée qui est ~207.0531.
+
+k | X<sub>k</sub>
+---- | ------
+0 | 256
+1 | 212
+2 | 207
+3 | 207
+
+En pratique, et quand on n'a pas accès à une calculatrice, il y a plusieurs considérations à prendre en compte pour implémenter ces calculs avec un chemin des données :
+- quelle précision choisir (combien de bits) pour représenter les calculs intermédiaires à l'intérieur du module;
+- quelle valeur choisir pour X<sub>0</sub>; et,
+- comment implémenter la division.
+
+### Pseudocode et micro-opérations
+
+Le calcul de la racine carrée par la méthode itérative de Newton peut se modéliser avec le pseudocode et les micro-opérations suivantes. Le pseudocode décrit une machine à états à deux états : {attente, calculs}.
+
+    si reset == '1' {
+        etat ← attente
+    } sinon, répéter à chaque coup d'horloge {
+        dans le cas où etat == "attente" {
+            fini ← 1;
+            si go = '1' alors {
+                k ← 0;
+                A_int ← A;
+                xk ← 255; -- la valeur de 255 est valide pour le cas où A est dans l'intervalle [0, 65535]
+                etat ← "calculs";
+            }
+        }
+        dans le cas où etat == "calculs" {
+            fini ← 0;
+            xk ← (xk + A / xk) / 2;
+            k ← k + 1;
+            si k = kmax alors {
+                etat ← "attente";
+            }
+        }
+    }
+    X ← xk;
+
+### Implémentation de la division
+
+La division générale n'est pas prise en charge par les outils de synthèse. Les diapositives de la semaine #6 présentent trois techniques synthétisables pour calculer la division générale. Pour ce laboratoire, on vous fournit un module de division générale par la technique de la réciproque dans le fichier [division_par_reciproque.vhd](sources/division_par_reciproque.vhd). Ce module est similaire à celui présenté dans les diapositives de la semaine #6.
+
+Inspectez le code et les explications dans les diapositives pour en comprendre le fonctionnement.
+
+## Partie 1 : conception du module de racine carrée et modélisation en VHDL
+
+Complétez la modélisation du module de la racine carrée donné dans le fichier [racine_carree.vhd](racine_carree.vhd).
+
+À remettre pour la partie 1 : votre fichier modifié et une brève explication de vos modifications dans le fichier [rapport.md](rapport.md);
+
+## Partie 2 : banc d'essai
+
+Vérifiez le fonctionnement de votre module [racine_carree.vhd](racine_carree.vhd) à l'aide du banc d'essai du fichier [racine_carree_tb.vhd](racine_carree_tb.vhd).
+
+Bonifiez le banc d'essai pour bien vérifier le fonctionnement de votre module.
+
+À remettre pour la partie 2 : votre banc d'essai modifié et une brève explication des vérifications effectuées par votre banc d'essai dans le fichier [rapport.md](rapport.md);
+
+## Partie 3 : implémentation sur la carte
+
 Les fichiers suivants sont  fournis pour aider à contrôler les interfaces de la carte et faire l'implémentation dans le FPGA. Ne les modifiez pas.
 - [utilitaires_inf3500_pkg.vhd](sources/utilitaires_inf3500_pkg.vhd) : pour regrouper un ensemble de fonctions utiles pour les laboratoires du cours;
 - [generateur_horloge_precis.vhd](sources/generateur_horloge_precis.vhd) : pour générer une horloge à une fréquence désirée à partir de l'horloge de la carte;
 - [monopulseur.vhd](sources/monopulseur.vhd) : pour synchroniser les actions des humains avec l'horloge du système;
-- [top_labo_3.vhd](sources/top_labo_3.vhd) : pour regrouper tous les fichiers lors de l'implémentation;
+- [top_labo_4.vhd](sources/top_labo_4.vhd) : pour regrouper tous les fichiers lors de l'implémentation;
 - [basys_3_top.xdc](xdc/basys_3_top.xdc), [nexys_a7_50t_top.xdc](xdc/nexys_a7_50t_top.xdc) et [nexys_a7_100t_top.xdc](xdc/nexys_a7_100t_top.xdc) : trois fichiers correspondant à trois cartes de développement différentes, pour établir des liens entre des identificateurs et des pattes du FPGA; et,
-- [labo_3_synth_impl.tcl](synthese-implementation/labo_3_synth_impl.tcl) : pour regrouper les commandes à utiliser pour faire l'implémentation.
+- [labo_4_synth_impl.tcl](synthese-implementation/labo_4_synth_impl.tcl) : pour regrouper les commandes à utiliser pour faire l'implémentation.
 
-### La machine à états et son code VHDL
-
-Une machine à états de base vous est fournie dans le fichier [cadenas_labo_3.vhd](sources/cadenas_labo_3.vhd). La machine à états de base correspond au diagramme d'états suivant.
-
-![machine à états de base](figures/machine_etats_de_base.svg)
-
-La machine a cinq états, E_00 à E_04 inclusivement. À chaque coup d'horloge, la machine avance d'un état si le bouton(0) a une valeur de '1'. Les sorties sont indiquées dans les états.
-
-### Simulation    
-
-Une ébauche de banc d'essai se trouve dans le fichier [cadenas_labo_3_tb.vhd](sources/cadenas_labo_3_tb.vhd).
-
-Faites la simulation de la machine à états de base à l'aide de ce banc d'essai. Avec Active-HDL :
-- Choisissez le module `cadenas_labo_3_tb` comme `Top-Level`.
-- Initialisez la simulation.
-- Créez un chronogramme et glissez-y l'unité sous test `UUT`.
-- Lancez la simulation, observez le chronogramme et observez les messages dans la console.
-- Constatez qu'une valeur de '1' au bouton(0) résulte en une transition vers un autre état lors de la prochaine transition positive de l'horloge.
-- Constatez que les sorties `ouvrir` et `alarme` sont déterminées par l'état actuel de la machine.
-
-Si vous utilisez un autre environnement, suivez des étapes similaires pour lancer la simulation et observer les résultats.
-
-### Implémentation et programmation de la carte
-
-Suivez les étapes suivantes pour faire la synthèse et l'implémentation du code sur votre carte :
-
-1. Lancez une fenêtre d'invite de commande (`cmd` sous Windows) et naviguez au répertoire `\inf350\labo-3\synthese-implementation\`.
-2. De ce répertoire, lancez Vivado en mode script avec la commande 
-`{repertoire-d-installation-d-Vivado}\bin\vivado -mode tcl` où {repertoire-d-installation-d-Vivado} est probablement C:\Xilinx\Vivado\2021.1 si votre système d'exploitation est Windows.
-3. Dans la fenêtre, à l'invite de commande `Vivado%`, entrez les commandes contenues dans le fichier [labo_3_synth_impl.tcl](synthese-implementation/labo_3_synth_impl.tcl). Si votre carte n'est pas une Basys 3, vous devrez commenter certaines lignes et en dé-commenter d'autres qui correspondent à votre carte.
-
-Observez le fonctionnement correct du système sur la carte. Inspectez le contenu du fichier [top_labo_3.vhd](sources/top_labo_3.vhd) pour connaître le pairage entre les ports de l'entité `cadenas_labo_3` et les périphériques d'entrées et de sortie de la carte : 
+Inspectez le contenu du fichier [top_labo_4.vhd](sources/top_labo_4.vhd) pour connaître le pairage entre les ports de l'entité `racine_carree` et les périphériques d'entrées et de sortie de la carte : 
 - Le port `reset` est relié au bouton du centre;
-- Le port `boutons(3 downto 0)` est relié dans l'ordre aux boutons du bas, de gauche, d'en haut et de droite.
-- Les boutons sont également reliés à des LED, directement et aussi par l'entremise du module de stabilisation et de synchronisation du fichier [monopulseur.vhd](sources/monopulseur.vhd). Observez que quand vous appuyez sur un bouton et le gardez pressé, une LED reste allumée et une autre ne reçoit qu'une seule courte impulsion.
-- Les ports `alarme` et `ouvrir` sont reliés aux LED(1:0).
-- L'affichage quadruple à 7 segments affiche les caractères placés sur le port `message`.
-
-## Partie 1 : Conception du cadenas
-
-### Spécifications de base
-
-Faites la conception d'un cadenas numérique à boutons rencontrant les spécifications suivantes :
-- La combinaison est composée d'une suite de boutons appuyés les uns après les autres dans une séquence déterminée. Conseil : chaque fois que le bon bouton est appuyé dans la séquence, votre machine devrait passer à l'état suivant. Si le mauvais bouton est appuyé, votre machine devrait retourner à l'état initial.
-- La combinaison de base doit être : {bouton-droite, bouton-haut, bouton-gauche, bouton-bas, bouton-droite}.
-- L'affichage doit indiquer un message représentatif de l'état actif.
-- Quand la combinaison est entrée correctement, le port `ouvrir` doit prendre la valeur '1', ce qui fait allumer la LED correspondante, et l'affichage doit indiquer "dbrr".
-- Le cadenas doit se verrouiller dès que le mauvais bouton est appuyé dans une séquence.
-- Pour verrouiller le cadenas après qu'il ait été débarré, on le réinitialise à l'aide du bouton du centre relié au port `reset`.
-- Pour cette partie, les ports `mode` et `alarme` ne sont pas utilisés.
-
-Modifiez le fichier [cadenas_labo_3.vhd](sources/cadenas_labo_3.vhd) en conséquence. **Ne modifiez pas le nom du fichier, le nom de l'entité, la liste et le nom des ports, la liste et le nom des `generics`, ni le nom de l'architecture.**
-
-### Simulation, vérification et débogage
-
-Modifiez le banc d'essai dans le fichier [cadenas_labo_3_tb.vhd](sources/cadenas_labo_3_tb.vhd) pour vérifier complètement votre cadenas. Simulez complètement votre code pour vous assurer qu'il rencontre bien toutes les spécifications.
-
-### Synthèse et implémentation
+- Le port `go` est relié au bouton de droite;
+- Les commutateurs permettent d'entrer le nombre A dont on cherche la racine carrée.
+- Le port `fini` est relié à la LED (0).
+- La sortie X est reliée à l'affichage quadruple à 7 segments.
 
 Faites la synthèse et l'implémentation de votre module pour votre carte. Vérifiez-en le fonctionnement.
 
-### À remettre pour la partie 1
+À remettre pour la partie #3 :
+- votre fichier de configuration final : [labo_4.bit](synthese-implementation/labo_4.bit);
+- le nombre de ressources du FPGA utilisées par votre module (racine_carree.vhd seulement);
+- le nombre de ressources du FPGA utilisées par votre système au complet (racine_carree.vhd seulement);
 
-- Un seul fichier [cadenas_labo_3.vhd](sources/cadenas_labo_3.vhd) modifié pour toute la partie 1;
-- Un diagramme d'états modifié en format .png ou .svg. Vous pouvez modifier directement [le diagramme fourni avec diagrams.net](https://app.diagrams.net/) ou bien soumettre un dessin fait à la main et numérisé, au propre, ou par tout autre moyen.
-- Une brève explication de vos modifications dans le fichier [rapport.md](rapport.md);
-- Une brève explication des vérifications effectuées par votre banc d'essai dans le fichier [rapport.md](rapport.md);
-- Votre fichier [cadenas_labo_3_tb.vhd](sources/cadenas_labo_3_tb.vhd) modifié;
-- Votre fichier de configuration final : [labo_3.bit](synthese-implementation/labo_3.bit).
-
-## Partie 2 : Conception du cadenas : spécifications avancées
-
-Ajoutez les spécifications suivantes à votre cadenas :
-- Quand le cadenas est débarré, on peut modifier la combinaison avec les étapes suivantes :
-    - Appuyer simultanément sur les boutons de droite et de gauche.
-    - L'affichage doit alors indiquer "modc" pour indiquer qu'on modifie maintenant la combinaison.
-    - Appuyer sur une séquence de cinq bouton (excluant le bouton du centre, relié au `reset`) afin de l'enregistrer comme nouvelle séquence, après quoi le cadenas se verrouille en retournant à son état initial.
-- Appuyer sur le bouton du centre `reset` a pour effet de réinitialiser la combinaison du cadenas à la séquence de la partie 1.
-- Quand le cadenas est débarré, appuyer simultanément sur les boutons du haut et du bas verrouille le cadenas sans réinitialiser la combinaison.
-- Pour cette partie, les ports `mode` et `alarme` ne sont pas utilisés.
-
-
-Modifiez votre banc d'essai pour vérifier les nouvelles fonctionnalités.
-
-Faites la synthèse et l'implémentez votre cadenas modifié. Vérifiez-en le fonctionnement correct sur votre carte.
-
-### À remettre pour la partie 2
-
-- Un seul fichier [cadenas_labo_3.vhd](sources/cadenas_labo_3.vhd) modifié pour les parties 1 et 2 mais avec des commentaires montrant clairement à quelle partie le code correspond;
-- Un seul diagramme d'états modifié pour les partie 1 et 2, en format .png ou .svg. Vous pouvez modifier directement [le diagramme fourni avec diagrams.net](https://app.diagrams.net/) ou bien soumettre un dessin fait à la main, au propre, ou par tout autre moyen.
-- Une brève explication de vos modifications dans le fichier [rapport.md](rapport.md);
-- Votre banc d'essai final qui vérifie toutes les spécifications des parties 1 et 2, dans un seul fichier [cadenas_labo_3_tb.vhd](sources/cadenas_labo_3_tb.vhd) modifié;
-- Votre fichier de configuration final : [labo_3.bit](synthese-implementation/labo_3.bit).
-
-## Partie 3: Bonus
+## Partie 4: Bonus
 
 **Mise en garde**. *Compléter correctement les parties 1 et 2 peut donner une note de 17 / 20 (85%), ce qui peut normalement être interprété comme un A. La partie bonus demande du travail supplémentaire qui sort normalement des attentes du cours. Il n'est pas nécessaire de la compléter pour réussir le cours ni pour obtenir une bonne note. Il n'est pas recommandé de s'y attaquer si vous éprouvez des difficultés dans un autre cours. La partie bonus propose un défi supplémentaire pour les personnes qui souhaitent s'investir davantage dans le cours INF3500 en toute connaissance de cause.*
 
-### 3a. Mode obfusqué
+### 4a. Une meilleure estimation de X<sub>0</sub>
 
-Dans les spécifications des parties 1 et 2, une utilisatrice astucieuse pourrait deviner la combinaison en essayant successivement tous les boutons et en observant la séquence des états. (Si le cadenas retourne à l'état initial, c'est nécessairement parce qu'on a appuyé sur le mauvais bouton.) Pour cette partie, ajoutez un mode de fonctionnement obfusqué activé par une valeur de "01" sur le port `mode` (le fonctionnement normal des parties 1 et 2 doit se faire quand le port `mode` a les valeurs "00", "10" ou "11".) Le porte `mode` est relié à deux commutateurs de la planchette - consultez le fichier [top_labo_3.vhd](sources/top_labo_3.vhd).
+On peut réduire de moitié le nombre d'itérations nécessaires pour que l'algorithme converge en choisissant une meilleure valeur de X<sub>0</sub> pour lancer l'algorithme. Pour N = 16 (avec A dans l'intervalle [0, 65535], de bonnes valeurs de départ X<sub>0</sub> sont données au tableau suivant : 
 
-Ajoutez les spécifications suivantes à votre machine :
-- La machine doit emmagasiner une séquence complète de 5 boutons appuyés avant de vérifier si la combinaison correcte a été entrée. La machine ne doit pas retourner à l'état initial tant que 5 boutons n'ont pas été appuyés les uns après les autres.
-- L'affichage doit indiquer "br_1", "br_2", "br_3", "br_4" et "br_5" pour indiquer à l'utilisateur l'indice du bouton dans la séquence en cours.
-- Si la séquence correcte est entrée, l'affichage doit indiquer "dbrr" pour (débarré).
-- Si la séquence est incorrecte, l'affichage doit indiquer "barr" pour (barré). Le système doit alors être prêt à accepter une nouvelle combinaison.
+A | X<sub>0</sub>
+---- | ------
+&gt; 16384 | 256
+&gt; 4096 | 128
+&gt; 1024 | 64
+&gt; 256 | 32
+&gt; 64 | 16
+&le; 64 | 8
 
-Expliquez tous vos changements dans votre rapport.
+Modifiez votre module pour choisir une meilleure valeur de X<sub>0</sub>. Expérimentez avec des valeurs réduites du nombre d'itérations pour voir l'effet.
 
-### 3b. Alarme pour essais incorrects multiples
+Donnez vos observations dans votre rapport.
 
-Si une utilisatrice entre un code incorrect à trois reprises, le port `alarme` doit être activé et l'affichage doit indiquer "alrm". La machine doit rester dans cet état jusqu'à ce que le bouton `reset` soit appuyé.
+### 4b. Modifier l'approche pour effectuer la division
 
-Expliquez tous vos changements dans votre rapport.
+Proposez une autre manière d'implémenter la division et faites-en l'essai dans votre module. Vous pouvez vous inspirez des notes de cours, en particulier l'algorithme de Goldschmidt, ou proposer votre propre méthode.
+
+Expliquez vos changements et vos observations dans votre rapport.
 
 ## Remise
 
@@ -193,8 +195,8 @@ Partie 1 : Spécifications de base | 8
 Partie 2 : Spécifications avancées | 7
 Qualité, lisibilité et élégance du code : alignement, choix des identificateurs, qualité et pertinence des commentaires, respect des consignes de remise incluant les noms des fichiers, orthographe, etc. | 2
 **Pleine réussite du labo** | **17**
-Bonus partie 3a. Mode obfusqué | 2
-Bonus partie 3b. Alarme | 1
+Bonus partie 3a. Meilleure valeur de départ X<sub>0</sub> | 2
+Bonus partie 3b. Division modifiée | 1
 **Maximum possible sur 20 points** | **20**
 
 
