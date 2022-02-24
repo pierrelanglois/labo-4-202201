@@ -12,14 +12,14 @@ Membre #2 : **nom, prénom, matricule**
 
 ## Partie #1
 
-Voici quelques informations sur notre conception montrée dans notre fichier [division_par_reciproque.vhd](sources/division_par_reciproque.vhd) :
+Voici quelques informations sur notre conception montrée dans notre fichier [racine_carree.vhd](sources/racine_carree.vhd) :
 - item 1
 - item 2
 - item 3
 
 ## Partie #2
 
-Voici quelques informations sur notre banc d'essai dans notre fichier [division_par_reciproque_tb.vhd](sources/division_par_reciproque_tb.vhd) :
+Voici quelques informations sur notre banc d'essai dans notre fichier [racine_carree_tb.vhd](sources/racine_carree_tb.vhd) :
 - item 1
 - item 2
 - item 3
@@ -47,11 +47,11 @@ tout le système | nombre?    | nombre?         | nombre?  | nombre?  | nombre?
 
 ### Partie 4a :
 
-Notre fichier [division_par_reciproque.vhd](sources/division_par_reciproque.vhd) contient des changements pour le calcul de la valeur initiale X<sub>0</sub>, aux lignes ... Nous avons choisi une approche basée sur ...
+Notre fichier [[racine_carree.vhd](sources/racine_carree.vhd). contient des changements pour le calcul de la valeur initiale X<sub>0</sub>, aux lignes ... Nous avons choisi une approche basée sur ...
 
 ### Partie 4b :
 
-Notre fichier [division_par_reciproque.vhd](sources/division_par_reciproque.vhd) contient des changements pour de la division.
+Notre fichier [racine_carree.vhd](sources/racine_carree.vhd) contient des changements pour de la division.
 
 Nous avons utiliser un module différent décrit dans le fichier [votre-nom-de-fichier.vhd](sources/votre-nom-de-fichier.vhd). Notre approche consiste à ...
 

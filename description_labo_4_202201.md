@@ -39,7 +39,7 @@ Ce laboratoire s'appuie principalement sur le matériel suivant :
 ### Préparatifs
 
 - Créez un répertoire "inf3500\labo4\" dans lequel vous mettrez tous les fichiers de ce laboratoire.
-- Importez tous les fichiers du laboratoire à partir de l'entrepôt Git et placez-les dans votre répertoire \labo4\
+- Importez tous les fichiers du laboratoire à partir de l'entrepôt Git et placez-les dans votre répertoire \labo4\.
 
 ## Partie 0 : Introduction
 
@@ -48,11 +48,11 @@ Ce laboratoire s'appuie principalement sur le matériel suivant :
 Dans cet exercice de laboratoire, on considère le problème de la conception d'un module qui calcule la racine carrée X d'un nombre A, (A = X &times; X). Ce module pourrait être ajouté à un microprocesseur pour en augmenter le jeu d'instructions.
 
 La figure suivante illustre l'interface du module avec le monde extérieur. Les différents ports du module sont comme suit :
-- Le nombre A est exprimé avec N bits.
-- La racine carrée X est exprimée avec M bits.
-- Les calculs sont lancés quand le signal go a la valeur '1' lors d'une transition positive du signal d'horloge clk. Le signal fini prend alors la valeur '0'.
-- Le signal fini prend la valeur '1' quand les calculs sont terminés, indiquant que le port X représente alors la racine carrée de A.
-- Le module est réinitialisé quand on place un '1' sur le port reset.
+- Le nombre `A` est exprimé avec N bits.
+- La racine carrée `X` est exprimée avec M bits.
+- Les calculs sont lancés quand le signal `go` a la valeur '1' lors d'une transition positive du signal d'horloge `clk`. Le signal `fini` prend alors la valeur '0'.
+- Le signal `fini` prend la valeur '1' quand les calculs sont terminés, indiquant que le port `X` représente alors la racine carrée de `A`.
+- Le module est réinitialisé quand on place un '1' sur le port `reset`.
 
 <img src="figures/racine-carree-module.svg" alt="module pour calculer la racine carrée" width="600">
 
@@ -62,14 +62,13 @@ On peut calculer la racine carrée X = sqrt(A) d'un nombre A par [la méthode it
 
 À chaque itération k, on calcule : X<sub>k+1</sub> = (X<sub>k</sub> + A / X<sub>k</sub>) / 2, et la valeur de Xk converge vers X = sqrt(A) après quelques itérations.
 
-Par exemple, pour A = 42871 et X<sub>0</sub> = 256, on obtiendrait la séquence montrée au tableau suivant en effectuant la division à l'aide d'une calculatrice et en arrondissant les Xk à l'entier le plus proche à chaque étape. La valeur finale après quatre itérations, 207, est très proche de la racine carrée qui est ~207.0531.
+Par exemple, pour A = 42871 et X<sub>0</sub> = 255, on obtiendrait la séquence montrée au tableau suivant en effectuant la division à l'aide d'une calculatrice et en arrondissant les Xk à l'entier le plus proche à chaque étape. La valeur finale après trois itérations, 207, est très proche de la racine carrée qui est ~207.0531.
 
 k | X<sub>k</sub>
 ---- | ------
 0 | 256
 1 | 212
 2 | 207
-3 | 207
 
 En pratique, et quand on n'a pas accès à une calculatrice, il y a plusieurs considérations à prendre en compte pour implémenter ces calculs avec un chemin des données :
 - quelle précision choisir (combien de bits) pour représenter les calculs intermédiaires à l'intérieur du module;
@@ -78,17 +77,17 @@ En pratique, et quand on n'a pas accès à une calculatrice, il y a plusieurs co
 
 ### Pseudocode et micro-opérations
 
-Le calcul de la racine carrée par la méthode itérative de Newton peut se modéliser avec le pseudocode et les micro-opérations suivantes. Le pseudocode décrit une machine à états à deux états : {attente, calculs}.
+Le calcul de la racine carrée par la méthode itérative de Newton peut se modéliser avec le pseudocode et les micro-opérations suivantes. Ce pseudocode décrit une machine à états à deux états : {attente, calculs}.
 
     si reset == '1' {
-        etat ← attente
+        etat ← "attente";
     } sinon, répéter à chaque coup d'horloge {
         dans le cas où etat == "attente" {
             fini ← 1;
             si go = '1' alors {
                 k ← 0;
                 A_int ← A;
-                xk ← 255; -- la valeur de 255 est valide pour le cas où A est dans l'intervalle [0, 65535]
+                xk ← 255; -- la valeur de 255 est valide pour les cas où A est dans l'intervalle [0, 65535]
                 etat ← "calculs";
             }
         }
@@ -111,13 +110,13 @@ Inspectez le code et les explications dans les diapositives pour en comprendre l
 
 ## Partie 1 : conception du module de racine carrée et modélisation en VHDL
 
-Complétez la modélisation du module de la racine carrée donné dans le fichier [racine_carree.vhd](racine_carree.vhd).
+Complétez la modélisation du module de la racine carrée donné dans le fichier [racine_carree.vhd](sources/racine_carree.vhd).
 
 À remettre pour la partie 1 : votre fichier modifié et une brève explication de vos modifications dans le fichier [rapport.md](rapport.md);
 
 ## Partie 2 : banc d'essai
 
-Vérifiez le fonctionnement de votre module [racine_carree.vhd](racine_carree.vhd) à l'aide du banc d'essai du fichier [racine_carree_tb.vhd](racine_carree_tb.vhd).
+Vérifiez le fonctionnement de votre module [racine_carree.vhd](sources/racine_carree.vhd) à l'aide du banc d'essai du fichier [racine_carree_tb.vhd](sources/racine_carree_tb.vhd).
 
 Bonifiez le banc d'essai pour bien vérifier le fonctionnement de votre module.
 
@@ -202,7 +201,7 @@ Bonus partie 3b. Division modifiée | 1
 
 ## Références pour creuser plus loin
 
-Les liens suivants ont été vérifiés en septembre 2021.
+Les liens suivants ont été vérifiés en février 2022.
 
 - Aldec Active-HDL Manual : accessible en faisant F1 dans l'application, et accessible [à partir du site de Aldec](https://www.aldec.com/en/support/resources/documentation/manuals/).
 - Tous les manuels de Xilinx :  <https://www.xilinx.com/products/design-tools/vivado/vivado-ml.html#documentation>
