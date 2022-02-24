@@ -47,7 +47,7 @@ tout le système | nombre?    | nombre?         | nombre?  | nombre?  | nombre?
 
 ### Partie 4a :
 
-Notre fichier [[racine_carree.vhd](sources/racine_carree.vhd). contient des changements pour le calcul de la valeur initiale X<sub>0</sub>, aux lignes ... Nous avons choisi une approche basée sur ...
+Notre fichier [racine_carree.vhd](sources/racine_carree.vhd). contient des changements pour le calcul de la valeur initiale X<sub>0</sub>, aux lignes ... Nous avons choisi une approche basée sur ...
 
 ### Partie 4b :
 

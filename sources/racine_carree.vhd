@@ -16,8 +16,8 @@ entity racine_carree is
         N : positive := 16;                     -- nombre de bits de A
         M : positive := 8;                      -- nombre de bits de X
         J : positive := 10;                     -- nombre d'itérations à faire
-		Went : integer := 8;                    -- nombre de bits pour la partie entière de la réciproque
-		Wfrac : integer := 4                    -- nombre de bits pour la partie fractionnaire de la réciproque
+        Went : integer := 8;                    -- nombre de bits pour la partie entière de la réciproque
+        Wfrac : integer := 4                    -- nombre de bits pour la partie fractionnaire de la réciproque
     );
     port (
         reset, clk : in std_logic;
