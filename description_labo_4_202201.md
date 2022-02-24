@@ -36,20 +36,20 @@ Ce laboratoire s'appuie principalement sur le matériel suivant :
 1. Les procédures utilisées et les habiletés développées dans les laboratoires #1, #2 et #3.
 2. La matière des cours des semaines 4 (Modélisation et vérification de circuits séquentiels), 5 (Conception de chemins des données) et 6 (Conception et implémentation de fonctions arithmétiques sur FPGA).
 
+## Partie 0 : Introduction
+
 ### Préparatifs
 
 - Créez un répertoire "inf3500\labo4\" dans lequel vous mettrez tous les fichiers de ce laboratoire.
 - Importez tous les fichiers du laboratoire à partir de l'entrepôt Git et placez-les dans votre répertoire \labo4\.
-
-## Partie 0 : Introduction
 
 ### Vue d'ensemble
 
 Dans cet exercice de laboratoire, on considère le problème de la conception d'un module qui calcule la racine carrée X d'un nombre A, (A = X &times; X). Ce module pourrait être ajouté à un microprocesseur pour en augmenter le jeu d'instructions.
 
 La figure suivante illustre l'interface du module avec le monde extérieur. Les différents ports du module sont comme suit :
-- Le nombre `A` est exprimé avec N bits.
-- La racine carrée `X` est exprimée avec M bits.
+- Le nombre `A` est un entier non signé (nécessairement positif) exprimé avec N bits.
+- La racine carrée `X` est un nombre qui pourrait être fractionnaire, exprimé avec M bits : N / 2 bits pour la partie entière et (M - N / 2) bits pour la partie fractionnaire.
 - Les calculs sont lancés quand le signal `go` a la valeur '1' lors d'une transition positive du signal d'horloge `clk`. Le signal `fini` prend alors la valeur '0'.
 - Le signal `fini` prend la valeur '1' quand les calculs sont terminés, indiquant que le port `X` représente alors la racine carrée de `A`.
 - Le module est réinitialisé quand on place un '1' sur le port `reset`.
