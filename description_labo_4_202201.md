@@ -66,7 +66,7 @@ Par exemple, pour A = 42871 et X<sub>0</sub> = 255, on obtiendrait la séquence 
 
 k | X<sub>k</sub>
 ---- | ------
-0 | 256
+0 | 255
 1 | 212
 2 | 207
 
@@ -86,7 +86,7 @@ Le calcul de la racine carrée par la méthode itérative de Newton peut se mod�
             si go = '1' alors {
                 k ← 0;
                 A_int ← A;
-                xk ← 255; -- la valeur de 255 est valide pour les cas où A est dans l'intervalle [0, 65535]
+                xk ← 255; -- la valeur X<sub>255</sub> est valide pour les cas où A est dans l'intervalle [0, 65535]
                 etat ← "calculs";
             }
         }
@@ -173,7 +173,7 @@ On peut réduire de moitié le nombre d'itérations nécessaires pour que l'algo
 
 A | X<sub>0</sub>
 ---- | ------
-&gt; 16384 | 256
+&gt; 16384 | 255
 &gt; 4096 | 128
 &gt; 1024 | 64
 &gt; 256 | 32
