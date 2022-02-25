@@ -83,7 +83,6 @@ Le calcul de la racine carrée par la méthode itérative de Newton peut se mod�
         etat ← "attente";
     } sinon, répéter à chaque coup d'horloge {
         dans le cas où etat == "attente" {
-            fini ← 1;
             si go = '1' alors {
                 k ← 0;
                 A_int ← A;
@@ -101,6 +100,11 @@ Le calcul de la racine carrée par la méthode itérative de Newton peut se mod�
         }
     }
     X ← xk;
+    si etat = "attente" {
+        fini ← 1;
+    } sinon {
+        fini ← 0;
+    }
 
 ### Implémentation de la division
 
@@ -108,9 +112,17 @@ La division générale n'est pas prise en charge par les outils de synthèse. Le
 
 Inspectez le code et les explications dans les diapositives pour en comprendre le fonctionnement.
 
+Pour ce laboratoire, une valeur de W_frac de 14 bits semble produire de bons résultats. Vous pouvez expérimenter avec cette valeur et voir l'effet sur la précision des calculs et les coûts d'implémentation.
+
 ## Partie 1 : conception du module de racine carrée et modélisation en VHDL
 
 Complétez la modélisation du module de la racine carrée donné dans le fichier [racine_carree.vhd](sources/racine_carree.vhd).
+
+Pour les besoins de ce laboratoire, vous devriez choisir `N` = 16, `M` = 8, `kmax` = 10, et `W_frac` = 14.
+
+*Attention* : VHDL étant VHDL, le plus grand défi est peut-être dans le codage de l'opération xk ← (xk + A / xk) / 2.
+- La division A / xk doit être produite par le module [division_par_reciproque.vhd](sources/division_par_reciproque.vhd) ou par un module de votre conception. Attention, ce module retourne un quotient sur 32 bits : 16 bits de partie entière et 14 bits de partie fractionnaire. Il faut enlever la partie fractionnaire et ne garder que les 8 bits les moins significatifs de la partie entière. Recommandation : faites-vous plusieurs exemples sur papier pour bien comprendre.
+- L'addition de deux nombres de M bits produit une somme de M + 1 bits. Il faut calculer cette somme, la diviser par 2 selon l'opération, puis ramener la somme à M bits. Encore une fois, faites-vous des exemples sur papier. La fonction `RESIZE (ARG: UNSIGNED; NEW_SIZE: NATURAL) return UNSIGNED;` du package [numeric.std](https://www.csee.umbc.edu/portal/help/VHDL/numeric_std.vhdl) peut simplifier l'écriture du code.
 
 À remettre pour la partie 1 : votre fichier modifié et une brève explication de vos modifications dans le fichier [rapport.md](rapport.md);
 
@@ -118,13 +130,15 @@ Complétez la modélisation du module de la racine carrée donné dans le fichie
 
 Vérifiez le fonctionnement de votre module [racine_carree.vhd](sources/racine_carree.vhd) à l'aide du banc d'essai du fichier [racine_carree_tb.vhd](sources/racine_carree_tb.vhd).
 
-Bonifiez le banc d'essai pour bien vérifier le fonctionnement de votre module.
+Bonifiez le banc d'essai pour bien vérifier le fonctionnement de votre module. Commencez par vérifier quelques cas seulement. Il faut appliquer un nombre au port `A`, activer le signal `go`, attendre le bon nombre de coups d'horloge, puis inspecter la réponse.
+
+Idéalement, votre banc d'essai ferait une stimulation exhaustive (avec tous les cas possibles de A) et calculerait l'erreur de votre module dans chaque cas. Quelle est l'erreur maximale ? L'erreur moyenne ?
 
 À remettre pour la partie 2 : votre banc d'essai modifié et une brève explication des vérifications effectuées par votre banc d'essai dans le fichier [rapport.md](rapport.md);
 
 ## Partie 3 : implémentation sur la carte
 
-Les fichiers suivants sont  fournis pour aider à contrôler les interfaces de la carte et faire l'implémentation dans le FPGA. Ne les modifiez pas.
+Les fichiers suivants sont fournis pour aider à contrôler les interfaces de la carte et faire l'implémentation dans le FPGA. Ne les modifiez pas.
 - [utilitaires_inf3500_pkg.vhd](sources/utilitaires_inf3500_pkg.vhd) : pour regrouper un ensemble de fonctions utiles pour les laboratoires du cours;
 - [generateur_horloge_precis.vhd](sources/generateur_horloge_precis.vhd) : pour générer une horloge à une fréquence désirée à partir de l'horloge de la carte;
 - [monopulseur.vhd](sources/monopulseur.vhd) : pour synchroniser les actions des humains avec l'horloge du système;
@@ -136,10 +150,13 @@ Inspectez le contenu du fichier [top_labo_4.vhd](sources/top_labo_4.vhd) pour co
 - Le port `reset` est relié au bouton du centre;
 - Le port `go` est relié au bouton de droite;
 - Les commutateurs permettent d'entrer le nombre A dont on cherche la racine carrée.
+- Les boutons contrôlent ce qui est affiché.
 - Le port `fini` est relié à la LED (0).
 - La sortie X est reliée à l'affichage quadruple à 7 segments.
 
 Faites la synthèse et l'implémentation de votre module pour votre carte. Vérifiez-en le fonctionnement.
+
+Vous pouvez expérimenter avec la fréquence d'horloge si vous voulez observer les étapes intermédiaires de calcul.
 
 À remettre pour la partie #3 :
 - votre fichier de configuration final : [labo_4.bit](synthese-implementation/labo_4.bit);

@@ -2,7 +2,7 @@
 -- 
 -- monopulseur.vhd
 --
--- v. 1.0, 2021/01/19, Pierre Langlois
+-- v. 1.0, 2022/01/19, Pierre Langlois
 -- Inspiré de beaucoup trop de sources pour toutes les citer, mais incluant https://vhdlguru.blogspot.com/2017/09/pushbutton-debounce-circuit-in-vhdl.html.
 -- Pour un traitement intéressant de la question, incluant un grand nombre de références, on peut consulter la suite de Maxfield dans l'EE Journal, janvier 2020 :
 -- https://www.eejournal.com/article/ultimate-guide-to-switch-debounce-part-1/
@@ -122,7 +122,7 @@ end arch;
 -- 
 -- banc d'essai
 --
--- v. 1.0, 2021-01-22, bien imparfaite et très incomplète
+-- v. 1.0, 2022-01-22, bien imparfaite et très incomplète
 --
 ---------------------------------------------------------------------------------------------------
 

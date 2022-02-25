@@ -2,7 +2,7 @@
 -- 
 -- racine_carree.vhd
 --
--- v. 1.0 Pierre Langlois 2022-02-23 laboratoire #4 INF3500
+-- v. 1.0 Pierre Langlois 2022-02-25 laboratoire #4 INF3500 - code de base
 --
 ---------------------------------------------------------------------------------------------------
 
@@ -15,9 +15,7 @@ entity racine_carree is
     generic (
         N : positive := 16;                     -- nombre de bits de A
         M : positive := 8;                      -- nombre de bits de X
-        J : positive := 10;                     -- nombre d'itérations à faire
-        Went : integer := 8;                    -- nombre de bits pour la partie entière de la réciproque
-        Wfrac : integer := 4                    -- nombre de bits pour la partie fractionnaire de la réciproque
+        kmax : positive := 10                   -- nombre d'itérations à faire
     );
     port (
         reset, clk : in std_logic;
@@ -30,18 +28,22 @@ end racine_carree;
 
 architecture newton of racine_carree is
     
--- votre code ici
+    constant W_frac : integer := 14;               -- pour le module de division, nombre de bits pour exprimer les réciproques
     
+    type etat_type is (attente, calculs);
+    signal etat : etat_type := attente;
+    
+--- votre code ici
+
 begin
     
 --    diviseur : entity division_par_reciproque(arch)
---        generic map (Went, Wfrac)
---        port map (un-nmérateur-ici, un-denominateur-ici, un-quotient-ici, un-signal-d-erreur-ici);
+--        generic map (N, M, W_frac)
+--        port map (un-signal-ici, un-signal-ici, un-signal-ici, un-signal-ici);
+
+    X <= to_unsigned(255, X'length); -- code bidon
+    fini <= '1'; -- code bidon
 
     -- votre code ici
-    
-    -- code bidon à remplacer
-    X <= to_unsigned(0, X'length);
-    fini <= '1';
     
 end newton;
