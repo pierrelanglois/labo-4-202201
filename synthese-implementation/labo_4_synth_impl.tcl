@@ -21,8 +21,9 @@ close_design
 remove_files [get_files]
 read_vhdl -vhdl2008 ../sources/utilitaires_inf3500_pkg.vhd
 read_vhdl -vhdl2008 ../sources/generateur_horloge_precis.vhd
-read_vhdl -vhdl2008 ../sources/monopulseur.vhd 
-read_vhdl -vhdl2008 ../sources/cadenas_labo_4.vhd
+read_vhdl -vhdl2008 ../sources/monopulseur.vhd
+read_vhdl -vhdl2008 ../sources/division_par_reciproque.vhd
+read_vhdl -vhdl2008 ../sources/racine_carree.vhd
 read_vhdl -vhdl2008 ../sources/top_labo_4.vhd
 
 # lecture du fichier de contraintes xdc; choisir la ligne qui correspond à votre carte
