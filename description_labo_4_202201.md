@@ -161,7 +161,7 @@ Vous pouvez expérimenter avec la fréquence d'horloge si vous voulez observer l
 À remettre pour la partie #3 :
 - votre fichier de configuration final : [labo_4.bit](synthese-implementation/labo_4.bit);
 - le nombre de ressources du FPGA utilisées par votre module (racine_carree.vhd seulement);
-- le nombre de ressources du FPGA utilisées par votre système au complet (racine_carree.vhd seulement);
+- le nombre de ressources du FPGA utilisées par votre système au complet (tous les fichiers du projet, incluant top_labo_4.vhd);
 
 ## Partie 4: Bonus
 
